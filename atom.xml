@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title><![CDATA[ripeconan]]></title>
+  
+  <link href="/atom.xml" rel="self"/>
+  <link href="http://yoursite.com/"/>
+  <updated>2014-10-18T13:33:57.712Z</updated>
+  <id>http://yoursite.com/</id>
+  
+  <author>
+    <name><![CDATA[ripeconan]]></name>
+    
+  </author>
+  
+  <generator uri="http://zespia.tw/hexo/">Hexo</generator>
+  
+  <entry>
+    <title><![CDATA[cumsum]]></title>
+    <link href="http://yoursite.com/2014/10/18/cumsum/"/>
+    <id>http://yoursite.com/2014/10/18/cumsum/</id>
+    <published>2014-10-18T10:46:40.000Z</published>
+    <updated>2014-10-18T11:16:13.000Z</updated>
+    <content type="html"><![CDATA[<h2 id="函数功能">函数功能</h2>
+<p>计算向量的累积和并返回  </p>
+<p>cum 系列还有另外三个函数：cumprod, cummin, cummax<br>它们的作用分别是计算向量的累积的乘积、极小值、极大值，并返回</p>
+<h2 id="函数参数说明">函数参数说明</h2>
+<p>cum 系列函数只有一个参数：cumsum(x), cumprod(x), cummin(x), cummax(x)  </p>
+<ol>
+<li>当使用 cumsum 或 cumprod 时，x 可以是数值型(numeric)或复数型(complex)的向量、矩阵、数据框，因为数值型和复数型可做求和、求积。</li>
+<li>当使用 cummin 或 cummax 时，x 只能是数值型的向量、矩阵、数据框。</li>
+</ol>
+<h2 id="函数返回值说明">函数返回值说明</h2>
+<p>当 x 是向量、矩阵时，cum 系列函数返回的是向量，因为矩阵的本质也是向量；当 x 是数据框时，返回值则仍为数据框。</p>
+<h2 id="函数使用示例">函数使用示例</h2>
+<p>对数值型向量求和：</p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cumsum(<span class="number">1</span>:<span class="number">10</span>)</div></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">##  [1]  1  3  6 10 15 21 28 36 45 55</span></div></pre></td></tr></table></figure>
+
+<p>对数值型矩阵求和，结果返回仍是向量：</p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cumsum(matrix(<span class="number">1</span>:<span class="number">12</span>, nrow = <span class="number">3</span>))</div></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">##  [1]  1  3  6 10 15 21 28 36 45 55 66 78</span></div></pre></td></tr></table></figure>
+
+<p>对数据框求和，返回结果仍然是数据框，对每个变量做操作：</p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cumsum(data.frame(a = <span class="number">1</span>:<span class="number">10</span>, b = <span class="number">21</span>:<span class="number">30</span>))</div></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">##     a   b</span></div><div class="line"><span class="preprocessor">## 1   1  21</span></div><div class="line"><span class="preprocessor">## 2   3  43</span></div><div class="line"><span class="preprocessor">## 3   6  66</span></div><div class="line"><span class="preprocessor">## 4  10  90</span></div><div class="line"><span class="preprocessor">## 5  15 115</span></div><div class="line"><span class="preprocessor">## 6  21 141</span></div><div class="line"><span class="preprocessor">## 7  28 168</span></div><div class="line"><span class="preprocessor">## 8  36 196</span></div><div class="line"><span class="preprocessor">## 9  45 225</span></div><div class="line"><span class="preprocessor">## 10 55 255</span></div></pre></td></tr></table></figure>
+
+<p>对复数型向量，可以求积：</p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">x &lt;- c(<span class="number">1</span> + <span class="number">2i</span>, <span class="number">2</span> - <span class="number">3i</span>, <span class="number">5</span> + <span class="number">10i</span>); </div><div class="line">cumprod(x)</div></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">## [1]  1+ 2i  8+ 1i 30+85i</span></div></pre></td></tr></table></figure>
+
+<p>对数值型向量求min：</p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cummin(c(<span class="number">3</span>,<span class="number">2</span>,<span class="number">5</span>,<span class="number">1</span>,<span class="number">4</span>))</div></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">## [1] 3 2 2 1 1</span></div></pre></td></tr></table></figure>
+
+<p>对数据框，每个变量分别求max：</p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cummax(data.frame(a = c(<span class="number">3</span>,<span class="number">2</span>,<span class="number">5</span>,<span class="number">1</span>,<span class="number">4</span>), b = c(<span class="number">1</span>,<span class="number">8</span>,<span class="number">3</span>,<span class="number">6</span>,<span class="number">5</span>)))</div></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">##   a b</span></div><div class="line"><span class="preprocessor">## 1 3 1</span></div><div class="line"><span class="preprocessor">## 2 3 8</span></div><div class="line"><span class="preprocessor">## 3 5 8</span></div><div class="line"><span class="preprocessor">## 4 5 8</span></div><div class="line"><span class="preprocessor">## 5 5 8</span></div></pre></td></tr></table></figure>
+
+]]></content>
+    <summary type="html">
+    <![CDATA[<h2 id="函数功能">函数功能</h2>
+<p>计算向量的累积和并返回  </p>
+<p>cum 系列还有另外三个函数：cumprod, cummin, cummax<br>它们的作用分别是计算向量的累积的乘积、极小值、极大值，并返回</p>
+<h2 id="函数参数说明"]]>
+    </summary>
+    
+      <category term="R函数" scheme="http://yoursite.com/tags/R%E5%87%BD%E6%95%B0/"/>
+    
+      <category term="R" scheme="http://yoursite.com/categories/R/"/>
+    
+  </entry>
+  
+</feed>
