@@ -3,9 +3,9 @@
   <title><![CDATA[ripeconan]]></title>
   
   <link href="/atom.xml" rel="self"/>
-  <link href="http://yoursite.com/"/>
-  <updated>2014-10-18T13:44:08.085Z</updated>
-  <id>http://yoursite.com/</id>
+  <link href="http://ripeconan.com/"/>
+  <updated>2014-10-18T13:51:29.588Z</updated>
+  <id>http://ripeconan.com/</id>
   
   <author>
     <name><![CDATA[ripeconan]]></name>
@@ -16,8 +16,8 @@
   
   <entry>
     <title><![CDATA[cumsum]]></title>
-    <link href="http://yoursite.com/2014/10/18/cumsum/"/>
-    <id>http://yoursite.com/2014/10/18/cumsum/</id>
+    <link href="http://ripeconan.com/2014/10/18/cumsum/"/>
+    <id>http://ripeconan.com/2014/10/18/cumsum/</id>
     <published>2014-10-18T10:46:40.000Z</published>
     <updated>2014-10-18T11:16:13.000Z</updated>
     <content type="html"><![CDATA[<h2 id="函数功能">函数功能</h2>
@@ -82,9 +82,9 @@
 <h2 id="函数参数说明"]]>
     </summary>
     
-      <category term="R函数" scheme="http://yoursite.com/tags/R%E5%87%BD%E6%95%B0/"/>
+      <category term="R函数" scheme="http://ripeconan.com/tags/R%E5%87%BD%E6%95%B0/"/>
     
-      <category term="R" scheme="http://yoursite.com/categories/R/"/>
+      <category term="R" scheme="http://ripeconan.com/categories/R/"/>
     
   </entry>
   
