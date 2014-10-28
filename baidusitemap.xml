@@ -1,26 +1,18 @@
-<?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom">
-  <title><![CDATA[ripeconan]]></title>
-  
-  <link href="/atom.xml" rel="self"/>
-  <link href="http://ripeconan.com/"/>
-  <updated>2014-10-28T08:52:22.527Z</updated>
-  <id>http://ripeconan.com/</id>
-  
-  <author>
-    <name><![CDATA[ripeconan]]></name>
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
     
-  </author>
-  
-  <generator uri="http://zespia.tw/hexo/">Hexo</generator>
-  
-  <entry>
-    <title><![CDATA[近期学习内容安排:2014年第四季度]]></title>
-    <link href="http://ripeconan.com/2014/10/23/recent%20to%20do/"/>
-    <id>http://ripeconan.com/2014/10/23/recent to do/</id>
-    <published>2014-10-23T01:19:55.000Z</published>
-    <updated>2014-10-23T01:29:39.000Z</updated>
-    <content type="html"><![CDATA[<h2 id="书目阅读">书目阅读</h2>
+  <url>
+    <loc>http://ripeconan.com/2014/10/23/recent%20to%20do/</loc>
+    <lastmod>2014-10-23T01:29:39.000Z</lastmod>
+    <data>
+        <display>
+        <title>近期学习内容安排:2014年第四季度</title>
+        <pubTime>2014-10-23T01:19:55.000Z</pubTime>
+        
+        <tag>To Do </tag>
+         
+         <content><![CDATA[<h2 id="书目阅读">书目阅读</h2>
 <ul>
 <li><p>统计科普类</p>
 <ol>
@@ -87,31 +79,30 @@
 <li>通过API来获取实时数据并加工整理</li>
 </ol>
 ]]></content>
-    <summary type="html">
-    <![CDATA[<h2 id="书目阅读">书目阅读</h2>
-<ul>
-<li><p>统计科普类</p>
-<ol>
-<li>无处不在的统计</li>
-<li>漫画统计学入门</li>
-<li>趣话概率——兼话《红楼梦》中的玄机</li>
-<li>漫话信息时代的统计学</li>
-<li>爱上统计]]>
-    </summary>
+         
+         
+           
+             
+              <breadCrumb title="Learning" url="http://ripeconan.com/categories/Learning/"/>
+          
+        </display>
+    </data>
+    </url>
+
     
-      <category term="To Do" scheme="http://ripeconan.com/tags/To-Do/"/>
-    
-      <category term="Learning" scheme="http://ripeconan.com/categories/Learning/"/>
-    
-  </entry>
-  
-  <entry>
-    <title><![CDATA[Power Map 学习笔记]]></title>
-    <link href="http://ripeconan.com/2014/10/22/Power%20Map/"/>
-    <id>http://ripeconan.com/2014/10/22/Power Map/</id>
-    <published>2014-10-21T16:00:00.000Z</published>
-    <updated>2014-10-22T14:19:15.000Z</updated>
-    <content type="html"><![CDATA[<h2 id="Power_Map_介绍">Power Map 介绍</h2>
+  <url>
+    <loc>http://ripeconan.com/2014/10/22/Power%20Map/</loc>
+    <lastmod>2014-10-22T14:19:15.000Z</lastmod>
+    <data>
+        <display>
+        <title>Power Map 学习笔记</title>
+        <pubTime>2014-10-21T16:00:00.000Z</pubTime>
+        
+        <tag>Excel </tag>
+         
+        <tag>可视化 </tag>
+         
+         <content><![CDATA[<h2 id="Power_Map_介绍">Power Map 介绍</h2>
 <p><strong>Power Map</strong> 是微软2013年推出的 Excel2013 的插件， <strong>Power BI</strong> 的组件之一，其前身是 <strong>Geoflow</strong>。以下是 <strong>Power Map</strong> 的官方简介：</p>
 <blockquote>
 <p>Power Map is a new 3D visualization add-in for Excel for mapping, exploring,<br>and interacting with geographical and temporal data, enabling people to<br>discover and share new insights.</p>
@@ -219,26 +210,30 @@
 </li>
 </ol>
 ]]></content>
-    <summary type="html">
-    <![CDATA[<h2 id="Power_Map_介绍">Power Map 介绍</h2>
-<p><strong>Power Map</strong> 是微软2013年推出的 Excel2013 的插件， <strong>Power BI</strong> 的组件之一，其前身是 <stron]]>
-    </summary>
+         
+         
+           
+             
+              <breadCrumb title="Visualization" url="http://ripeconan.com/categories/Visualization/"/>
+          
+        </display>
+    </data>
+    </url>
+
     
-      <category term="Excel" scheme="http://ripeconan.com/tags/Excel/"/>
     
-      <category term="可视化" scheme="http://ripeconan.com/tags/%E5%8F%AF%E8%A7%86%E5%8C%96/"/>
     
-      <category term="Visualization" scheme="http://ripeconan.com/categories/Visualization/"/>
-    
-  </entry>
-  
-  <entry>
-    <title><![CDATA[cumsum]]></title>
-    <link href="http://ripeconan.com/2014/10/18/cumsum/"/>
-    <id>http://ripeconan.com/2014/10/18/cumsum/</id>
-    <published>2014-10-18T10:46:40.000Z</published>
-    <updated>2014-10-18T11:16:13.000Z</updated>
-    <content type="html"><![CDATA[<h2 id="函数功能">函数功能</h2>
+  <url>
+    <loc>http://ripeconan.com/2014/10/18/cumsum/</loc>
+    <lastmod>2014-10-18T11:16:13.000Z</lastmod>
+    <data>
+        <display>
+        <title>cumsum</title>
+        <pubTime>2014-10-18T10:46:40.000Z</pubTime>
+        
+        <tag>R函数 </tag>
+         
+         <content><![CDATA[<h2 id="函数功能">函数功能</h2>
 <p>计算向量的累积和并返回  </p>
 <p>cum 系列还有另外三个函数：cumprod, cummin, cummax<br>它们的作用分别是计算向量的累积的乘积、极小值、极大值，并返回</p>
 <h2 id="函数参数说明">函数参数说明</h2>
@@ -293,17 +288,14 @@
 <figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">##   a b</span></div><div class="line"><span class="preprocessor">## 1 3 1</span></div><div class="line"><span class="preprocessor">## 2 3 8</span></div><div class="line"><span class="preprocessor">## 3 5 8</span></div><div class="line"><span class="preprocessor">## 4 5 8</span></div><div class="line"><span class="preprocessor">## 5 5 8</span></div></pre></td></tr></table></figure>
 
 ]]></content>
-    <summary type="html">
-    <![CDATA[<h2 id="函数功能">函数功能</h2>
-<p>计算向量的累积和并返回  </p>
-<p>cum 系列还有另外三个函数：cumprod, cummin, cummax<br>它们的作用分别是计算向量的累积的乘积、极小值、极大值，并返回</p>
-<h2 id="函数参数说明"]]>
-    </summary>
-    
-      <category term="R函数" scheme="http://ripeconan.com/tags/R%E5%87%BD%E6%95%B0/"/>
-    
-      <category term="R" scheme="http://ripeconan.com/categories/R/"/>
-    
-  </entry>
-  
-</feed>
+         
+         
+           
+             
+              <breadCrumb title="R" url="http://ripeconan.com/categories/R/"/>
+          
+        </display>
+    </data>
+    </url>
+
+</urlset>
