@@ -1,0 +1,545 @@
+
+ <!DOCTYPE HTML>
+<html >
+<head>
+  <meta charset="UTF-8">
+  <meta name="baidu_union_verify" content="d1952c66cf48912e21c18c7c581f382a">
+  <meta name="360-site-verification" content="67fbcc5a67f4c65c057315b28fa0b2c8" />
+<meta name="google-site-verification" content="2GzxQ0VtXwTSUdmGm6DzcmhTzM_I9QmzCb_pzpMzD88" />
+  
+    <title>class 包中的 knn 系列函数 | ripeconan</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="ripeconan">
+    
+    <meta name="description" content="函数功能
+对测试集的每一行，去找训练集里欧式距离最近的 k 行，利用草根民主法，决定测试集该行的类别。
+class 包中还有两个和 knn 相关的函数：knn1, knn.cv这三个包处理的问题分别是：
+
+knn k-Nearest Neighbour Classification
+knn1 1-n">
+    
+    
+    
+    
+    <link rel="alternate" href="atom.xml" title="ripeconan" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+    
+    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            var _bdId ='63d745e76199bc2f1546dacc46fc8127';
+             hm.src = "//hm.baidu.com/hm.js?" + _bdId;
+             var s = document.getElementsByTagName("script")[0]; 
+             s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+     
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="ripeconan">ripeconan</a></h1>
+				<a class="blog-motto"></a>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+					<li>
+					
+                                            <form class="search" action=http://zhannei.baidu.com/cse/search target="_blank">
+                                            <label>Search</label>
+                                        <input name="s" type="hidden" value= 1569724209730504620 ><input type="text" name="q" size="30" placeholder="Search"><br>
+					
+					
+				</ul>
+                            </nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/11/10/class_knn/" title="class 包中的 knn 系列函数" itemprop="url">class 包中的 knn 系列函数</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://ripeconan.com" title="ripeconan">ripeconan</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2014-11-09T16:00:00.000Z" itemprop="datePublished">Nov 10 2014</time>
+    Updated:<time datetime="2014-11-10T15:19:15.000Z" itemprop="dateModified">Nov 10 2014</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#函数功能"><span class="toc-number">1.</span> <span class="toc-text">函数功能</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#函数参数说明"><span class="toc-number">2.</span> <span class="toc-text">函数参数说明</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#knn_的函数说明"><span class="toc-number">2.1.</span> <span class="toc-text">knn 的函数说明</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#knn1_的函数说明"><span class="toc-number">2.2.</span> <span class="toc-text">knn1 的函数说明</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#knn-cv_的函数说明"><span class="toc-number">2.3.</span> <span class="toc-text">knn.cv 的函数说明</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#函数返回值说明"><span class="toc-number">3.</span> <span class="toc-text">函数返回值说明</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#函数使用示例"><span class="toc-number">4.</span> <span class="toc-text">函数使用示例</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#数据集情况"><span class="toc-number">4.1.</span> <span class="toc-text">数据集情况</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#数据集处理"><span class="toc-number">4.2.</span> <span class="toc-text">数据集处理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用_knn_预测"><span class="toc-number">4.3.</span> <span class="toc-text">使用 knn 预测</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用_knn1_预测"><span class="toc-number">4.4.</span> <span class="toc-text">使用 knn1 预测</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用_knn-cv_预测"><span class="toc-number">4.5.</span> <span class="toc-text">使用 knn.cv 预测</span></a></li></ol></li></ol>
+		</div>
+		
+		<h2 id="函数功能">函数功能</h2>
+<p>对测试集的每一行，去找训练集里欧式距离最近的 k 行，利用草根民主法，决定测试集该行的类别。</p>
+<p><strong>class</strong> 包中还有两个和 <strong>knn</strong> 相关的函数：<strong>knn1</strong>, <strong>knn.cv</strong><br>这三个包处理的问题分别是：</p>
+<ul>
+<li>knn k-Nearest Neighbour Classification</li>
+<li>knn1 1-nearest neighbour classification</li>
+<li>knn.cv k-Nearest Neighbour Cross-Validatory Classification</li>
+</ul>
+<h2 id="函数参数说明">函数参数说明</h2>
+<h3 id="knn_的函数说明"><strong>knn</strong> 的函数说明</h3>
+<p><strong>knn</strong> 函数形式是  <code>knn(train, test, cl, k = 1, l = 0, prob = FALSE, use.all = TRUE)</code> , 重要的参数如下：</p>
+<ul>
+<li>train 训练集数据，可以是矩阵或者数据框类型</li>
+<li>test 测试集数据，可以是矩阵或者数据框类型</li>
+<li>cl 训练集对应的真实分类数据，应该是因子类型的向量</li>
+<li>k 选择的近邻个数</li>
+</ul>
+<h3 id="knn1_的函数说明"><strong>knn1</strong> 的函数说明</h3>
+<p><strong>knn1</strong> 函数形式是 <code>knn1(train, test, cl)</code>，即 <strong>knn</strong> 中选择 <code>k = 1</code> 的情况，因此 <strong>knn1</strong> 是 <strong>knn</strong> 的一个退化情况 </p>
+<h3 id="knn-cv_的函数说明"><strong>knn.cv</strong> 的函数说明</h3>
+<p><strong>knn.cv</strong> 函数形式是  <code>knn.cv(train, cl, k = 1, l = 0, prob = FALSE, use.all = TRUE)</code>，其使用的方法是 <strong>leave-one-out cross validation</strong>。即所有的样本点都算到训练集中去，不设置测试集。对每个训练集中的样本点，都使用剩余的样本点中的 k 个最近邻来进行投票，从而决定该样本点的分类。</p>
+<h2 id="函数返回值说明">函数返回值说明</h2>
+<p>该系列函数返回一个<strong>因子</strong>向量，是测试集对应的分类(在 <strong>knn.cv</strong> 中是训练集对应的分类)</p>
+<h2 id="函数使用示例">函数使用示例</h2>
+<h3 id="数据集情况">数据集情况</h3>
+<p>我们使用 R 自带的 <code>iris3</code> 数据集，先看看数据大致情况</p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">class(iris3)</div></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">#<span class="array"># </span>[<span class="number">1</span>] <span class="string">"array"</span></div></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">dim(iris3)</div></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">## [1] 50  4  3</span></div></pre></td></tr></table></figure>
+
+<p>数据是以三维数组的形式存放，第三维度即3种鸢尾属植物，对于每一种植物，我们采集了4个特征，分别是</p>
+<p>-Sepal.Length 花萼长度<br>-Sepal.Width 花萼宽度<br>-Petal.Length 花瓣长度<br>-Petal.Width 花瓣宽度</p>
+<p>每种植物，我们采集了50个样本</p>
+<h3 id="数据集处理">数据集处理</h3>
+<p>我们对每种植物各选择25个样本，组成训练集，因此训练集的大小是75个样本</p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">train &lt;- rbind(iris3[<span class="number">1</span>:<span class="number">25</span>,,<span class="number">1</span>], iris3[<span class="number">1</span>:<span class="number">25</span>,,<span class="number">2</span>], iris3[<span class="number">1</span>:<span class="number">25</span>,,<span class="number">3</span>])</div></pre></td></tr></table></figure>
+
+<p>同样，每种植物剩下的25个样本，组合起来，作为测试集</p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">test &lt;- rbind(iris3[<span class="number">26</span>:<span class="number">50</span>,,<span class="number">1</span>], iris3[<span class="number">26</span>:<span class="number">50</span>,,<span class="number">2</span>], iris3[<span class="number">26</span>:<span class="number">50</span>,,<span class="number">3</span>])</div></pre></td></tr></table></figure>
+
+<p>再准备好训练集的分类数据向量，要求是因子类型，所以要转化一下</p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cl &lt;- factor(c(rep(<span class="string">"s"</span>,<span class="number">25</span>), rep(<span class="string">"c"</span>,<span class="number">25</span>), rep(<span class="string">"v"</span>,<span class="number">25</span>)))</div></pre></td></tr></table></figure>
+
+<h3 id="使用_knn_预测">使用 knn 预测</h3>
+<p>最后，使用 <strong>knn</strong> 函数，选择最邻近的 3 个样本点来投票</p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">library</span>(class)</div><div class="line">final &lt;- knn(train, test, cl, k = <span class="number">3</span>)</div><div class="line">final</div></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">##  [<span class="number">1</span>] s s s s s s s s s s s s s s s s s s s s s s s s s <span class="built_in">c</span> <span class="built_in">c</span> v <span class="built_in">c</span> <span class="built_in">c</span> <span class="built_in">c</span> <span class="built_in">c</span> <span class="built_in">c</span> v <span class="built_in">c</span></div><div class="line">## [<span class="number">36</span>] <span class="built_in">c</span> <span class="built_in">c</span> <span class="built_in">c</span> <span class="built_in">c</span> <span class="built_in">c</span> <span class="built_in">c</span> <span class="built_in">c</span> <span class="built_in">c</span> <span class="built_in">c</span> <span class="built_in">c</span> <span class="built_in">c</span> <span class="built_in">c</span> <span class="built_in">c</span> <span class="built_in">c</span> <span class="built_in">c</span> v <span class="built_in">c</span> <span class="built_in">c</span> v v v v v v v v v v <span class="built_in">c</span> v v v v v v</div><div class="line">## [<span class="number">71</span>] v v v v v</div><div class="line">## <span class="type">Levels</span>: <span class="built_in">c</span> s v</div></pre></td></tr></table></figure>
+
+<p>我们可以看一下正确率如何</p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="number">1</span> - sum(cl != final)/length(cl)</div></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">## [1] 0.9333333</span></div></pre></td></tr></table></figure>
+
+<h3 id="使用_knn1_预测">使用 knn1 预测</h3>
+<p>如果使用 knn1 函数进行预测，则选择的就是最近的一个样本点来直接做决定</p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">final1 &lt;- knn1(train, test, cl)</div><div class="line"><span class="number">1</span> - sum(cl != final1)/length(cl)</div></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">## [1] 0.9466667</span></div></pre></td></tr></table></figure>
+
+<p>可以看到，<strong>knn1</strong> 在本例中的正确率要高于 k = 3 时的 <strong>knn</strong> </p>
+<h3 id="使用_knn-cv_预测">使用 knn.cv 预测</h3>
+<p>由于在 <strong>knn.cv</strong> 中不设置测试集，所以要把所有的样本点都放到训练集中去，因此训练集共 150 个样本点</p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">train &lt;- rbind(iris3[,,<span class="number">1</span>], iris3[,,<span class="number">2</span>], iris3[,,<span class="number">3</span>])</div></pre></td></tr></table></figure>
+
+<p>同样，训练集对应的真实分类数据也是长度为 150 的向量</p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cl.cv &lt;- factor(c(rep(<span class="string">"s"</span>,<span class="number">50</span>), rep(<span class="string">"c"</span>,<span class="number">50</span>), rep(<span class="string">"v"</span>,<span class="number">50</span>)))</div></pre></td></tr></table></figure>
+
+<p>最后，对训练集的每一行做预测，利用其余行的 3 个最近邻来投票</p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">final.cv &lt;- knn.cv(train, cl.cv, k = <span class="number">3</span>)</div><div class="line"><span class="number">1</span> - sum(cl.cv != final.cv)/length(cl.cv)</div></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">## [1] 0.96</span></div></pre></td></tr></table></figure>
+
+<p>可以看到，iris3 中对这三种方法的预测效果排序，<strong>knn.cv(k = 3)</strong> 优于 <strong>knn1</strong> 优于 <strong>knn(k = 3)</strong></p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/R-package/">R package</a><a href="/tags/R函数/">R函数</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Machine-Learning/">Machine Learning</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://ripeconan.com/2014/11/10/class_knn/" data-title="class 包中的 knn 系列函数 | ripeconan" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2014/10/23/recent to do/"  title="近期学习内容安排:2014年第四季度">
+ <strong>NEXT:</strong><br/> 
+ <span>近期学习内容安排:2014年第四季度
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section class="comment">
+	<div class="ds-thread"></div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#函数功能"><span class="toc-number">1.</span> <span class="toc-text">函数功能</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#函数参数说明"><span class="toc-number">2.</span> <span class="toc-text">函数参数说明</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#knn_的函数说明"><span class="toc-number">2.1.</span> <span class="toc-text">knn 的函数说明</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#knn1_的函数说明"><span class="toc-number">2.2.</span> <span class="toc-text">knn1 的函数说明</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#knn-cv_的函数说明"><span class="toc-number">2.3.</span> <span class="toc-text">knn.cv 的函数说明</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#函数返回值说明"><span class="toc-number">3.</span> <span class="toc-text">函数返回值说明</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#函数使用示例"><span class="toc-number">4.</span> <span class="toc-text">函数使用示例</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#数据集情况"><span class="toc-number">4.1.</span> <span class="toc-text">数据集情况</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#数据集处理"><span class="toc-number">4.2.</span> <span class="toc-text">数据集处理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用_knn_预测"><span class="toc-number">4.3.</span> <span class="toc-text">使用 knn 预测</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用_knn1_预测"><span class="toc-number">4.4.</span> <span class="toc-text">使用 knn1 预测</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用_knn-cv_预测"><span class="toc-number">4.5.</span> <span class="toc-text">使用 knn.cv 预测</span></a></li></ol></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+<div id="authorInfo">
+	
+		<div class="author-logo"></div>		
+	
+	<div class="social-list" class="clearfix">
+		
+		
+		
+		
+		
+	</div>
+</div>
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">Categories</p>
+		<ul>
+		
+			<li><a href="/categories/Learning/" title="Learning">Learning<sup>1</sup></a></li>
+		
+			<li><a href="/categories/Machine-Learning/" title="Machine Learning">Machine Learning<sup>1</sup></a></li>
+		
+			<li><a href="/categories/R/" title="R">R<sup>1</sup></a></li>
+		
+			<li><a href="/categories/Visualization/" title="Visualization">Visualization<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Excel/" title="Excel">Excel<sup>1</sup></a></li>
+		
+			<li><a href="/tags/R-package/" title="R package">R package<sup>1</sup></a></li>
+		
+			<li><a href="/tags/R函数/" title="R函数">R函数<sup>2</sup></a></li>
+		
+			<li><a href="/tags/To-Do/" title="To Do">To Do<sup>1</sup></a></li>
+		
+			<li><a href="/tags/可视化/" title="可视化">可视化<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+      <li><a href="http://zjdian.com" target="_blank" title="zjdian">中继点</a></li>
+      <li><a href="http://blog.fens.me" target="_blank" title="fens">粉丝日志</a></li>
+      <li><a href="http://gengbiao.me/" target="_blank" title="coney">coney's Blog</a></li>
+      <li><a href="http://tim4chan.com/" target="_blank" title="fens">Tim Chan's Blog</a></li>
+    </ul>
+</div>
+
+
+
+  <div class="rsspart">
+	<a href="atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  
+  <div class="tagcloudlist">
+    <p class="asidetitle">Tag Cloud</p>
+    <div class="tagcloudlist clearfix">
+       <a href="/tags/Excel/" style="font-size: 10.00px;">Excel</a><a href="/tags/R-package/" style="font-size: 10.00px;">R package</a><a href="/tags/R函数/" style="font-size: 20.00px;">R函数</a><a href="/tags/To-Do/" style="font-size: 10.00px;">To Do</a><a href="/tags/可视化/" style="font-size: 10.00px;">可视化</a>
+    </div>
+  </div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+    
+            <p class="copyright"> © 2014 
+		
+		<a href="http://ripeconan.com" target="_blank" title="ripeconan">ripeconan</a>
+		
+            && Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> && Theme by <a href="http://gengbiao.me" target="_blank" title="coney">coney</a>
+            </div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"null"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+<script>
+    
+        var _bdImg = '4';
+    
+    window._bd_share_config={
+        "common":{
+            "bdSnsKey":{
+
+            },
+            "bdText":"",
+            "bdMini":"2",
+            "bdMiniList":[
+                "qzone",
+                "tsina",
+                "weixin",
+                "renren",
+                "tqq",
+                "tieba",
+                "douban",
+                "sqq",
+                "diandian",
+                "huaban",
+                "youdao",
+                "mail",
+                "ty",
+                "fbook",
+                "twi",
+                "linkedin",
+                "copy",
+                "print"
+            ],
+            "bdPic":"",
+            "bdStyle":"0",
+            "bdSize":"16"
+        },
+        "slide":{
+            "type":"slide",
+            "bdImg":_bdImg,
+            "bdPos":"right",
+            "bdTop":"350"
+        },
+        "image":{
+            "viewList":[
+                "weixin",
+                "qzone",
+                "tsina",
+                "renren",
+                "douban",
+                "tqq"
+            ],
+            "viewText":"分享：",
+            "viewSize":"16"
+        },
+        "selectShare":{
+            "bdContainerClass":null,
+            "bdSelectMiniList":[
+                "weixin",
+                "qzone",
+                "tsina",
+                "renren",
+                "douban",
+                "tqq"
+            ]
+        }
+    };
+    with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+
+
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'null', 'null');  
+ga('send', 'pageview');
+</script>
+
+
+  </body>
+</html>
+
