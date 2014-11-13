@@ -1,0 +1,546 @@
+
+ <!DOCTYPE HTML>
+<html >
+<head>
+  <meta charset="UTF-8">
+  <meta name="baidu_union_verify" content="d1952c66cf48912e21c18c7c581f382a">
+  <meta name="360-site-verification" content="67fbcc5a67f4c65c057315b28fa0b2c8" />
+<meta name="google-site-verification" content="2GzxQ0VtXwTSUdmGm6DzcmhTzM_I9QmzCb_pzpMzD88" />
+  
+    <title>基于 knn 方法分析乳腺癌数据 | ripeconan</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="ripeconan">
+    
+    <meta name="description" content="数据来源
+数据：来自于 UCI 常用数据，也是机器学习的经典数据http://mlr.cs.umass.edu/ml/machine-learning-databases/breast-cancer-wisconsin/wdbc.data
+
+数据说明：对数据变量的解释和其他解说请看http://ml">
+    
+    
+    
+    
+    <link rel="alternate" href="atom.xml" title="ripeconan" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+    
+    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            var _bdId ='63d745e76199bc2f1546dacc46fc8127';
+             hm.src = "//hm.baidu.com/hm.js?" + _bdId;
+             var s = document.getElementsByTagName("script")[0]; 
+             s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+     
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="ripeconan">ripeconan</a></h1>
+				<a class="blog-motto"></a>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+					<li>
+					
+                                            <form class="search" action=http://zhannei.baidu.com/cse/search target="_blank">
+                                            <label>Search</label>
+                                        <input name="s" type="hidden" value= 1569724209730504620 ><input type="text" name="q" size="30" placeholder="Search"><br>
+					
+					
+				</ul>
+                            </nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/11/13/breast_cancer/" title="基于 knn 方法分析乳腺癌数据" itemprop="url">基于 knn 方法分析乳腺癌数据</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://ripeconan.com" title="ripeconan">ripeconan</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2014-11-12T16:00:00.000Z" itemprop="datePublished">Nov 13 2014</time>
+    Updated:<time datetime="2014-11-13T07:31:39.000Z" itemprop="dateModified">Nov 13 2014</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#数据来源"><span class="toc-number">1.</span> <span class="toc-text">数据来源</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#数据了解"><span class="toc-number">2.</span> <span class="toc-text">数据了解</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#数据处理"><span class="toc-number">3.</span> <span class="toc-text">数据处理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#数据读取"><span class="toc-number">3.1.</span> <span class="toc-text">数据读取</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#数据预处理"><span class="toc-number">3.2.</span> <span class="toc-text">数据预处理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用_caret_包进行_knn_预测"><span class="toc-number">3.3.</span> <span class="toc-text">使用 caret 包进行 knn 预测</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#10-fold_crossvalidations"><span class="toc-number">3.4.</span> <span class="toc-text">10-fold crossvalidations</span></a></li></ol></li></ol>
+		</div>
+		
+		<h2 id="数据来源">数据来源</h2>
+<p>数据：来自于 UCI 常用数据，也是机器学习的经典数据<br><a href="http://mlr.cs.umass.edu/ml/machine-learning-databases/breast-cancer-wisconsin/wdbc.data" target="_blank" rel="external">http://mlr.cs.umass.edu/ml/machine-learning-databases/breast-cancer-wisconsin/wdbc.data</a></p>
+<hr>
+<p>数据说明：对数据变量的解释和其他解说请看<br><a href="http://mlr.cs.umass.edu/ml/machine-learning-databases/breast-cancer-wisconsin/wdbc.names" target="_blank" rel="external">http://mlr.cs.umass.edu/ml/machine-learning-databases/breast-cancer-wisconsin/wdbc.names</a></p>
+<hr>
+<h2 id="数据了解">数据了解</h2>
+<p>根据数据说明，我们可以得知，该数据集共569个样本，32个特征，需要预测的是第二个特征 <strong>diagnosis: B = benign, M = malignant</strong>，即乳腺癌是良性还是恶性的  </p>
+<hr>
+<p>其中第一个特征是用户id，从第3个到第32个特征都是十个特征的不同度量，其中十个特征是指</p>
+<pre><code><span class="operator">a</span>) radius (mean <span class="operator">of</span> distances <span class="built_in">from</span> center <span class="built_in">to</span> points <span class="command"><span class="keyword">on</span> <span class="title">the</span> <span class="title">perimeter</span>)</span>
+b) texture (standard deviation <span class="operator">of</span> gray-scale values)
+c) perimeter
+d) area
+e) smoothness (<span class="built_in">local</span> variation <span class="operator">in</span> radius lengths)
+f) compactness (perimeter^<span class="number">2</span> / area - <span class="number">1.0</span>)
+g) concavity (severity <span class="operator">of</span> concave portions <span class="operator">of</span> <span class="operator">the</span> contour)
+h) concave points (<span class="built_in">number</span> <span class="operator">of</span> concave portions <span class="operator">of</span> <span class="operator">the</span> contour)
+i) symmetry 
+j) fractal dimension (<span class="string">"coastline approximation"</span> - <span class="number">1</span>)
+</code></pre><p>3-12是这十个特征的 <strong>mean</strong>, 13-22是它们的 <strong>standard error</strong>, 23-32是 <strong>mean of the three largest values</strong></p>
+<hr>
+<p>之前最好的预测：</p>
+<pre><code>best predictive accuracy obtained <span class="keyword">using</span> <span class="constant">one</span> separating plane
+<span class="operator">in</span> <span class="operator">the</span> <span class="number">3</span>-D <span class="constant">space</span> <span class="operator">of</span> Worst Area, Worst Smoothness <span class="operator">and</span>
+Mean Texture.  Estimated accuracy <span class="number">97.5</span>% <span class="keyword">using</span> repeated
+<span class="number">10</span>-fold crossvalidations.  Classifier has correctly
+diagnosed <span class="number">176</span> consecutive <span class="built_in">new</span> patients <span class="keyword">as</span> <span class="operator">of</span> November
+<span class="number">1995.</span> 
+</code></pre><p>针对以上数据集，我们将分别使用 <strong>class</strong> 包和 <strong>caret</strong> 包来进行 <strong>knn</strong> 算法的实现</p>
+<hr>
+<h2 id="数据处理">数据处理</h2>
+<hr>
+<h3 id="数据读取">数据读取</h3>
+<p>首先，从网络读取数据，并查看一下，与数据说明的描述一致</p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">wdbc &lt;- read.table(<span class="string">"http://mlr.cs.umass.edu/ml/machine-learning-databases/breast-cancer-wisconsin/wdbc.data"</span>,sep = <span class="string">","</span>)</div><div class="line">dim(wdbc)</div></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">## [1] 569  32</span></div></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="数据预处理">数据预处理</h3>
+<p>我们需要给变量命名</p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">wdbc.names=c(<span class="string">"Radius"</span>,<span class="string">"Texture"</span>,<span class="string">"Perimeter"</span>,<span class="string">"Area"</span>,<span class="string">"Smoothness"</span>,<span class="string">"Compactness"</span>,<span class="string">"Concavity"</span>,<span class="string">"Concave points"</span>,<span class="string">"Symmetry"</span>,<span class="string">"Fractal dimension"</span>)</div><div class="line">wdbc.names=c(paste(wdbc.names,<span class="string">"_mean"</span>,sep=<span class="string">""</span>),paste(wdbc.names,<span class="string">"_se"</span>,sep=<span class="string">""</span>),paste(wdbc.names,<span class="string">"_worst"</span>,sep=<span class="string">""</span>))</div><div class="line">names(wdbc)=c(<span class="string">"id"</span>,<span class="string">"diagnosis"</span>,wdbc.names)</div></pre></td></tr></table></figure>
+
+<p>虽然可以使用所有的 30 个特征来预测乳腺癌的性质， 但是我们只验证在数据说明中提到的最好预测情形， 即使用 <em>Worst Area</em>, <em>Worst Smoothness</em> 和 <em>Mean Texture</em> 三个特征来进行预测。 为此，我们提取出相关数据</p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">wdbc.short &lt;- wdbc[c(<span class="string">"diagnosis"</span>,<span class="string">"Area_worst"</span>,<span class="string">"Smoothness_worst"</span>,<span class="string">"Texture_mean"</span>)]</div><div class="line">summary(wdbc.short)</div></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">##  <span class="tag">diagnosis</span>   <span class="tag">Area_worst</span>     <span class="tag">Smoothness_worst</span>   <span class="tag">Texture_mean</span>  </div><div class="line">##  <span class="tag">B</span><span class="pseudo">:357</span>     <span class="tag">Min</span>.   : 185<span class="class">.2</span>   <span class="tag">Min</span>.   <span class="pseudo">:0</span><span class="class">.07117</span>   <span class="tag">Min</span>.   : 9<span class="class">.71</span>  </div><div class="line">##  <span class="tag">M</span><span class="pseudo">:212</span>     1<span class="tag">st</span> <span class="tag">Qu</span>.: 515<span class="class">.3</span>   1<span class="tag">st</span> <span class="tag">Qu</span>.<span class="pseudo">:0</span><span class="class">.11660</span>   1<span class="tag">st</span> <span class="tag">Qu</span>.<span class="pseudo">:16</span><span class="class">.17</span>  </div><div class="line">##            <span class="tag">Median</span> : 686<span class="class">.5</span>   <span class="tag">Median</span> <span class="pseudo">:0</span><span class="class">.13130</span>   <span class="tag">Median</span> <span class="pseudo">:18</span><span class="class">.84</span>  </div><div class="line">##            <span class="tag">Mean</span>   : 880<span class="class">.6</span>   <span class="tag">Mean</span>   <span class="pseudo">:0</span><span class="class">.13237</span>   <span class="tag">Mean</span>   <span class="pseudo">:19</span><span class="class">.29</span>  </div><div class="line">##            3<span class="tag">rd</span> <span class="tag">Qu</span>.<span class="pseudo">:1084</span><span class="class">.0</span>   3<span class="tag">rd</span> <span class="tag">Qu</span>.<span class="pseudo">:0</span><span class="class">.14600</span>   3<span class="tag">rd</span> <span class="tag">Qu</span>.<span class="pseudo">:21</span><span class="class">.80</span>  </div><div class="line">##            <span class="tag">Max</span>.   <span class="pseudo">:4254</span><span class="class">.0</span>   <span class="tag">Max</span>.   <span class="pseudo">:0</span><span class="class">.22260</span>   <span class="tag">Max</span>.   <span class="pseudo">:39</span><span class="class">.28</span></div></pre></td></tr></table></figure>
+
+<p>由于这三个特征的数据范围相差太大，为此，我们使用 <strong>scale</strong> 函数将其标准化</p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">wdbc.short[<span class="number">2</span>:<span class="number">4</span>] &lt;- scale(wdbc.short[<span class="number">2</span>:<span class="number">4</span>])</div><div class="line">summary(wdbc.short)</div></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">##  diagnosis   Area_worst      Smoothness_worst   Texture_mean    </span></div><div class="line"><span class="preprocessor">##  B:357     Min.   :-1.2213   Min.   :-2.6803   Min.   :-2.2273  </span></div><div class="line"><span class="preprocessor">##  M:212     1st Qu.:-0.6416   1st Qu.:-0.6906   1st Qu.:-0.7253  </span></div><div class="line"><span class="preprocessor">##            Median :-0.3409   Median :-0.0468   Median :-0.1045  </span></div><div class="line"><span class="preprocessor">##            Mean   : 0.0000   Mean   : 0.0000   Mean   : 0.0000  </span></div><div class="line"><span class="preprocessor">##            3rd Qu.: 0.3573   3rd Qu.: 0.5970   3rd Qu.: 0.5837  </span></div><div class="line"><span class="preprocessor">##            Max.   : 5.9250   Max.   : 3.9519   Max.   : 4.6478</span></div></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="使用_caret_包进行_knn_预测">使用 caret 包进行 knn 预测</h3>
+<p>接下来，我们先使用 <strong>caret</strong> 包，对该数据集进行预测。 首先把数据集分为训练集和测试集，各取一半样本点。</p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">library</span>(caret)</div><div class="line">index &lt;- createDataPartition(wdbc.short$diagnosis)</div><div class="line">caret.fit &lt;- knn3(diagnosis ~ ., wdbc.short, index[[<span class="number">1</span>]], k = <span class="number">5</span>)</div><div class="line">predict.caret &lt;- predict(caret.fit,newdata = wdbc.short[-index[[<span class="number">1</span>]],<span class="number">2</span>:<span class="number">4</span>], type = <span class="string">"class"</span>)</div></pre></td></tr></table></figure>
+
+<p>我们来看一下使用 <strong>caret</strong> 包对乳腺癌测试集预测的准确性</p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sum(wdbc.short[-index[[<span class="number">1</span>]],<span class="number">1</span>] == predict.caret)/length(index[[<span class="number">1</span>]])</div></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">## [1] 0.9403509</span></div></pre></td></tr></table></figure>
+
+<p>准确率还是不错的。</p>
+<hr>
+<h3 id="10-fold_crossvalidations">10-fold crossvalidations</h3>
+<p>我们看到在数据说明里，使用 <strong>repeated 10-fold crossvalidations</strong> 可以达到 <strong>97.5%</strong> 的准确率。 我们使用 <strong>cvTools</strong> 包中的 <strong>cvFolds</strong> 函数产生用于进行 10折交叉验证的下标，但是前提条件是被分组的变量需是排过序的，因此我们使用 <strong>reshape</strong> 包中的 <strong>sort_df</strong> 来对数据集进行排序</p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">library</span>(cvTools)</div><div class="line"><span class="keyword">library</span>(reshape)</div><div class="line">wdbc.short &lt;- sort_df(wdbc.short, <span class="string">"diagnosis"</span>)</div></pre></td></tr></table></figure>
+
+<hr>
+<p>然后，分别对良性和恶性两类样本分别分为十组。由于 <strong>cvFolds</strong> 函数返回的是一个特有类的对象，我们要从中抽取出想要的部分，并使用 <strong>rbind</strong> 和 <strong>cbind</strong> 合并为下标矩阵 <code>index.matrix</code></p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">set.seed(<span class="number">2014</span>)</div><div class="line">Benign.folds &lt;- cvFolds(n = as.numeric(table(wdbc.short$diagnosis)[<span class="string">"B"</span>]), K = <span class="number">10</span>, type = <span class="string">"random"</span>)</div><div class="line">set.seed(<span class="number">2014</span>)</div><div class="line">Malignant.folds &lt;- cvFolds(n = as.numeric(table(wdbc.short$diagnosis)[<span class="string">"M"</span>]), K = <span class="number">10</span>, type = <span class="string">"random"</span>)</div><div class="line">index.matrix &lt;- rbind(cbind(Benign.folds$which,as.vector(Benign.folds$subsets)),cbind(Malignant.folds$which,as.vector(Malignant.folds$subsets)+as.numeric(table(wdbc.short$diagnosis)[<span class="string">"B"</span>])))</div></pre></td></tr></table></figure>
+
+<hr>
+<p>由于一共有 569 个样本，无法均匀分成 10 组，所以我们需要用一个因子 <strong>index.folds</strong> 来存放各个组对应样本的下标。对于每个组，我们使用另外 9 组建模，并对该组进行验证，此即交叉验证。 <code>prediction.right</code> 向量用来存放每组验证的正确率.</p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">index.folds &lt;- list()</div><div class="line">prediction.right &lt;- vector()</div><div class="line"><span class="keyword">for</span>(i <span class="keyword">in</span> <span class="number">1</span>:<span class="number">10</span>){</div><div class="line">  index.folds[[i]] &lt;- index.matrix[index.matrix[,<span class="number">1</span>] == i,<span class="number">2</span>]</div><div class="line">}</div><div class="line"><span class="keyword">for</span>(i <span class="keyword">in</span> <span class="number">1</span>:<span class="number">10</span>){</div><div class="line">  current.model &lt;- knn3(diagnosis ~ ., data = wdbc.short, subset = -index.folds[[i]])</div><div class="line">  prediction &lt;- predict(current.model, newdata = wdbc.short[index.folds[[i]],<span class="number">2</span>:<span class="number">4</span>], type = <span class="string">"class"</span>)</div><div class="line">  prediction.right[i] &lt;- sum(prediction == wdbc.short[index.folds[[i]],<span class="string">"diagnosis"</span>])</div><div class="line">}</div><div class="line">sum(prediction.right)/nrow(wdbc.short)</div></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">## [1] 0.9507909</span></div></pre></td></tr></table></figure>
+
+<hr>
+<p>最后我们看到，使用 <strong>10-fold crossvalidations</strong> 的正确率为 0.9507909, 虽然优于没有使用交叉验证的情况，但是并没有达到预想中的 97.5%, 这可能和我们并没有使用 <strong>repeat</strong> 方法有关。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/data-mining/">data mining</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Machine-Learning/">Machine Learning</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://ripeconan.com/2014/11/13/breast_cancer/" data-title="基于 knn 方法分析乳腺癌数据 | ripeconan" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2014/11/11/knn/"  title="knn 算法简介和三种实现方式">
+ <strong>NEXT:</strong><br/> 
+ <span>knn 算法简介和三种实现方式
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section class="comment">
+	<div class="ds-thread"></div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#数据来源"><span class="toc-number">1.</span> <span class="toc-text">数据来源</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#数据了解"><span class="toc-number">2.</span> <span class="toc-text">数据了解</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#数据处理"><span class="toc-number">3.</span> <span class="toc-text">数据处理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#数据读取"><span class="toc-number">3.1.</span> <span class="toc-text">数据读取</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#数据预处理"><span class="toc-number">3.2.</span> <span class="toc-text">数据预处理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用_caret_包进行_knn_预测"><span class="toc-number">3.3.</span> <span class="toc-text">使用 caret 包进行 knn 预测</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#10-fold_crossvalidations"><span class="toc-number">3.4.</span> <span class="toc-text">10-fold crossvalidations</span></a></li></ol></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+<div id="authorInfo">
+	
+		<div class="author-logo"></div>		
+	
+	<div class="social-list" class="clearfix">
+		
+		
+		
+		
+		
+	</div>
+</div>
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">Categories</p>
+		<ul>
+		
+			<li><a href="/categories/Learning/" title="Learning">Learning<sup>1</sup></a></li>
+		
+			<li><a href="/categories/Machine-Learning/" title="Machine Learning">Machine Learning<sup>3</sup></a></li>
+		
+			<li><a href="/categories/R/" title="R">R<sup>1</sup></a></li>
+		
+			<li><a href="/categories/Visualization/" title="Visualization">Visualization<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Excel/" title="Excel">Excel<sup>1</sup></a></li>
+		
+			<li><a href="/tags/R-package/" title="R package">R package<sup>1</sup></a></li>
+		
+			<li><a href="/tags/R函数/" title="R函数">R函数<sup>2</sup></a></li>
+		
+			<li><a href="/tags/To-Do/" title="To Do">To Do<sup>1</sup></a></li>
+		
+			<li><a href="/tags/algorithms/" title="algorithms">algorithms<sup>1</sup></a></li>
+		
+			<li><a href="/tags/data-mining/" title="data mining">data mining<sup>2</sup></a></li>
+		
+			<li><a href="/tags/可视化/" title="可视化">可视化<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+      <li><a href="http://zjdian.com" target="_blank" title="zjdian">中继点</a></li>
+      <li><a href="http://blog.fens.me" target="_blank" title="fens">粉丝日志</a></li>
+      <li><a href="http://gengbiao.me/" target="_blank" title="coney">coney's Blog</a></li>
+      <li><a href="http://tim4chan.com/" target="_blank" title="fens">Tim Chan's Blog</a></li>
+    </ul>
+</div>
+
+
+
+  <div class="rsspart">
+	<a href="atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  
+  <div class="tagcloudlist">
+    <p class="asidetitle">Tag Cloud</p>
+    <div class="tagcloudlist clearfix">
+       <a href="/tags/Excel/" style="font-size: 10.00px;">Excel</a><a href="/tags/R-package/" style="font-size: 10.00px;">R package</a><a href="/tags/R函数/" style="font-size: 20.00px;">R函数</a><a href="/tags/To-Do/" style="font-size: 10.00px;">To Do</a><a href="/tags/algorithms/" style="font-size: 10.00px;">algorithms</a><a href="/tags/data-mining/" style="font-size: 20.00px;">data mining</a><a href="/tags/可视化/" style="font-size: 10.00px;">可视化</a>
+    </div>
+  </div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+    
+            <p class="copyright"> © 2014 
+		
+		<a href="http://ripeconan.com" target="_blank" title="ripeconan">ripeconan</a>
+		
+            && Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> && Theme by <a href="http://gengbiao.me" target="_blank" title="coney">coney</a>
+            </div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"null"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+<script>
+    
+        var _bdImg = '4';
+    
+    window._bd_share_config={
+        "common":{
+            "bdSnsKey":{
+
+            },
+            "bdText":"",
+            "bdMini":"2",
+            "bdMiniList":[
+                "qzone",
+                "tsina",
+                "weixin",
+                "renren",
+                "tqq",
+                "tieba",
+                "douban",
+                "sqq",
+                "diandian",
+                "huaban",
+                "youdao",
+                "mail",
+                "ty",
+                "fbook",
+                "twi",
+                "linkedin",
+                "copy",
+                "print"
+            ],
+            "bdPic":"",
+            "bdStyle":"0",
+            "bdSize":"16"
+        },
+        "slide":{
+            "type":"slide",
+            "bdImg":_bdImg,
+            "bdPos":"right",
+            "bdTop":"350"
+        },
+        "image":{
+            "viewList":[
+                "weixin",
+                "qzone",
+                "tsina",
+                "renren",
+                "douban",
+                "tqq"
+            ],
+            "viewText":"分享：",
+            "viewSize":"16"
+        },
+        "selectShare":{
+            "bdContainerClass":null,
+            "bdSelectMiniList":[
+                "weixin",
+                "qzone",
+                "tsina",
+                "renren",
+                "douban",
+                "tqq"
+            ]
+        }
+    };
+    with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+
+
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'null', 'null');  
+ga('send', 'pageview');
+</script>
+
+
+  </body>
+</html>
+

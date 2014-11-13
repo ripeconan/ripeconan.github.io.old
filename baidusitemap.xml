@@ -3,6 +3,119 @@
 
     
   <url>
+    <loc>http://ripeconan.com/2014/11/13/breast_cancer/</loc>
+    <lastmod>2014-11-13T07:31:39.000Z</lastmod>
+    <data>
+        <display>
+        <title>基于 knn 方法分析乳腺癌数据</title>
+        <pubTime>2014-11-12T16:00:00.000Z</pubTime>
+        
+        <tag>data mining </tag>
+         
+         <content><![CDATA[<h2 id="数据来源">数据来源</h2>
+<p>数据：来自于 UCI 常用数据，也是机器学习的经典数据<br><a href="http://mlr.cs.umass.edu/ml/machine-learning-databases/breast-cancer-wisconsin/wdbc.data" target="_blank" rel="external">http://mlr.cs.umass.edu/ml/machine-learning-databases/breast-cancer-wisconsin/wdbc.data</a></p>
+<hr>
+<p>数据说明：对数据变量的解释和其他解说请看<br><a href="http://mlr.cs.umass.edu/ml/machine-learning-databases/breast-cancer-wisconsin/wdbc.names" target="_blank" rel="external">http://mlr.cs.umass.edu/ml/machine-learning-databases/breast-cancer-wisconsin/wdbc.names</a></p>
+<hr>
+<h2 id="数据了解">数据了解</h2>
+<p>根据数据说明，我们可以得知，该数据集共569个样本，32个特征，需要预测的是第二个特征 <strong>diagnosis: B = benign, M = malignant</strong>，即乳腺癌是良性还是恶性的  </p>
+<hr>
+<p>其中第一个特征是用户id，从第3个到第32个特征都是十个特征的不同度量，其中十个特征是指</p>
+<pre><code><span class="operator">a</span>) radius (mean <span class="operator">of</span> distances <span class="built_in">from</span> center <span class="built_in">to</span> points <span class="command"><span class="keyword">on</span> <span class="title">the</span> <span class="title">perimeter</span>)</span>
+b) texture (standard deviation <span class="operator">of</span> gray-scale values)
+c) perimeter
+d) area
+e) smoothness (<span class="built_in">local</span> variation <span class="operator">in</span> radius lengths)
+f) compactness (perimeter^<span class="number">2</span> / area - <span class="number">1.0</span>)
+g) concavity (severity <span class="operator">of</span> concave portions <span class="operator">of</span> <span class="operator">the</span> contour)
+h) concave points (<span class="built_in">number</span> <span class="operator">of</span> concave portions <span class="operator">of</span> <span class="operator">the</span> contour)
+i) symmetry 
+j) fractal dimension (<span class="string">"coastline approximation"</span> - <span class="number">1</span>)
+</code></pre><p>3-12是这十个特征的 <strong>mean</strong>, 13-22是它们的 <strong>standard error</strong>, 23-32是 <strong>mean of the three largest values</strong></p>
+<hr>
+<p>之前最好的预测：</p>
+<pre><code>best predictive accuracy obtained <span class="keyword">using</span> <span class="constant">one</span> separating plane
+<span class="operator">in</span> <span class="operator">the</span> <span class="number">3</span>-D <span class="constant">space</span> <span class="operator">of</span> Worst Area, Worst Smoothness <span class="operator">and</span>
+Mean Texture.  Estimated accuracy <span class="number">97.5</span>% <span class="keyword">using</span> repeated
+<span class="number">10</span>-fold crossvalidations.  Classifier has correctly
+diagnosed <span class="number">176</span> consecutive <span class="built_in">new</span> patients <span class="keyword">as</span> <span class="operator">of</span> November
+<span class="number">1995.</span> 
+</code></pre><p>针对以上数据集，我们将分别使用 <strong>class</strong> 包和 <strong>caret</strong> 包来进行 <strong>knn</strong> 算法的实现</p>
+<hr>
+<h2 id="数据处理">数据处理</h2>
+<hr>
+<h3 id="数据读取">数据读取</h3>
+<p>首先，从网络读取数据，并查看一下，与数据说明的描述一致</p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">wdbc &lt;- read.table(<span class="string">"http://mlr.cs.umass.edu/ml/machine-learning-databases/breast-cancer-wisconsin/wdbc.data"</span>,sep = <span class="string">","</span>)</div><div class="line">dim(wdbc)</div></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">## [1] 569  32</span></div></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="数据预处理">数据预处理</h3>
+<p>我们需要给变量命名</p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">wdbc.names=c(<span class="string">"Radius"</span>,<span class="string">"Texture"</span>,<span class="string">"Perimeter"</span>,<span class="string">"Area"</span>,<span class="string">"Smoothness"</span>,<span class="string">"Compactness"</span>,<span class="string">"Concavity"</span>,<span class="string">"Concave points"</span>,<span class="string">"Symmetry"</span>,<span class="string">"Fractal dimension"</span>)</div><div class="line">wdbc.names=c(paste(wdbc.names,<span class="string">"_mean"</span>,sep=<span class="string">""</span>),paste(wdbc.names,<span class="string">"_se"</span>,sep=<span class="string">""</span>),paste(wdbc.names,<span class="string">"_worst"</span>,sep=<span class="string">""</span>))</div><div class="line">names(wdbc)=c(<span class="string">"id"</span>,<span class="string">"diagnosis"</span>,wdbc.names)</div></pre></td></tr></table></figure>
+
+<p>虽然可以使用所有的 30 个特征来预测乳腺癌的性质， 但是我们只验证在数据说明中提到的最好预测情形， 即使用 <em>Worst Area</em>, <em>Worst Smoothness</em> 和 <em>Mean Texture</em> 三个特征来进行预测。 为此，我们提取出相关数据</p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">wdbc.short &lt;- wdbc[c(<span class="string">"diagnosis"</span>,<span class="string">"Area_worst"</span>,<span class="string">"Smoothness_worst"</span>,<span class="string">"Texture_mean"</span>)]</div><div class="line">summary(wdbc.short)</div></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">##  <span class="tag">diagnosis</span>   <span class="tag">Area_worst</span>     <span class="tag">Smoothness_worst</span>   <span class="tag">Texture_mean</span>  </div><div class="line">##  <span class="tag">B</span><span class="pseudo">:357</span>     <span class="tag">Min</span>.   : 185<span class="class">.2</span>   <span class="tag">Min</span>.   <span class="pseudo">:0</span><span class="class">.07117</span>   <span class="tag">Min</span>.   : 9<span class="class">.71</span>  </div><div class="line">##  <span class="tag">M</span><span class="pseudo">:212</span>     1<span class="tag">st</span> <span class="tag">Qu</span>.: 515<span class="class">.3</span>   1<span class="tag">st</span> <span class="tag">Qu</span>.<span class="pseudo">:0</span><span class="class">.11660</span>   1<span class="tag">st</span> <span class="tag">Qu</span>.<span class="pseudo">:16</span><span class="class">.17</span>  </div><div class="line">##            <span class="tag">Median</span> : 686<span class="class">.5</span>   <span class="tag">Median</span> <span class="pseudo">:0</span><span class="class">.13130</span>   <span class="tag">Median</span> <span class="pseudo">:18</span><span class="class">.84</span>  </div><div class="line">##            <span class="tag">Mean</span>   : 880<span class="class">.6</span>   <span class="tag">Mean</span>   <span class="pseudo">:0</span><span class="class">.13237</span>   <span class="tag">Mean</span>   <span class="pseudo">:19</span><span class="class">.29</span>  </div><div class="line">##            3<span class="tag">rd</span> <span class="tag">Qu</span>.<span class="pseudo">:1084</span><span class="class">.0</span>   3<span class="tag">rd</span> <span class="tag">Qu</span>.<span class="pseudo">:0</span><span class="class">.14600</span>   3<span class="tag">rd</span> <span class="tag">Qu</span>.<span class="pseudo">:21</span><span class="class">.80</span>  </div><div class="line">##            <span class="tag">Max</span>.   <span class="pseudo">:4254</span><span class="class">.0</span>   <span class="tag">Max</span>.   <span class="pseudo">:0</span><span class="class">.22260</span>   <span class="tag">Max</span>.   <span class="pseudo">:39</span><span class="class">.28</span></div></pre></td></tr></table></figure>
+
+<p>由于这三个特征的数据范围相差太大，为此，我们使用 <strong>scale</strong> 函数将其标准化</p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">wdbc.short[<span class="number">2</span>:<span class="number">4</span>] &lt;- scale(wdbc.short[<span class="number">2</span>:<span class="number">4</span>])</div><div class="line">summary(wdbc.short)</div></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">##  diagnosis   Area_worst      Smoothness_worst   Texture_mean    </span></div><div class="line"><span class="preprocessor">##  B:357     Min.   :-1.2213   Min.   :-2.6803   Min.   :-2.2273  </span></div><div class="line"><span class="preprocessor">##  M:212     1st Qu.:-0.6416   1st Qu.:-0.6906   1st Qu.:-0.7253  </span></div><div class="line"><span class="preprocessor">##            Median :-0.3409   Median :-0.0468   Median :-0.1045  </span></div><div class="line"><span class="preprocessor">##            Mean   : 0.0000   Mean   : 0.0000   Mean   : 0.0000  </span></div><div class="line"><span class="preprocessor">##            3rd Qu.: 0.3573   3rd Qu.: 0.5970   3rd Qu.: 0.5837  </span></div><div class="line"><span class="preprocessor">##            Max.   : 5.9250   Max.   : 3.9519   Max.   : 4.6478</span></div></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="使用_caret_包进行_knn_预测">使用 caret 包进行 knn 预测</h3>
+<p>接下来，我们先使用 <strong>caret</strong> 包，对该数据集进行预测。 首先把数据集分为训练集和测试集，各取一半样本点。</p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">library</span>(caret)</div><div class="line">index &lt;- createDataPartition(wdbc.short$diagnosis)</div><div class="line">caret.fit &lt;- knn3(diagnosis ~ ., wdbc.short, index[[<span class="number">1</span>]], k = <span class="number">5</span>)</div><div class="line">predict.caret &lt;- predict(caret.fit,newdata = wdbc.short[-index[[<span class="number">1</span>]],<span class="number">2</span>:<span class="number">4</span>], type = <span class="string">"class"</span>)</div></pre></td></tr></table></figure>
+
+<p>我们来看一下使用 <strong>caret</strong> 包对乳腺癌测试集预测的准确性</p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sum(wdbc.short[-index[[<span class="number">1</span>]],<span class="number">1</span>] == predict.caret)/length(index[[<span class="number">1</span>]])</div></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">## [1] 0.9403509</span></div></pre></td></tr></table></figure>
+
+<p>准确率还是不错的。</p>
+<hr>
+<h3 id="10-fold_crossvalidations">10-fold crossvalidations</h3>
+<p>我们看到在数据说明里，使用 <strong>repeated 10-fold crossvalidations</strong> 可以达到 <strong>97.5%</strong> 的准确率。 我们使用 <strong>cvTools</strong> 包中的 <strong>cvFolds</strong> 函数产生用于进行 10折交叉验证的下标，但是前提条件是被分组的变量需是排过序的，因此我们使用 <strong>reshape</strong> 包中的 <strong>sort_df</strong> 来对数据集进行排序</p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">library</span>(cvTools)</div><div class="line"><span class="keyword">library</span>(reshape)</div><div class="line">wdbc.short &lt;- sort_df(wdbc.short, <span class="string">"diagnosis"</span>)</div></pre></td></tr></table></figure>
+
+<hr>
+<p>然后，分别对良性和恶性两类样本分别分为十组。由于 <strong>cvFolds</strong> 函数返回的是一个特有类的对象，我们要从中抽取出想要的部分，并使用 <strong>rbind</strong> 和 <strong>cbind</strong> 合并为下标矩阵 <code>index.matrix</code></p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">set.seed(<span class="number">2014</span>)</div><div class="line">Benign.folds &lt;- cvFolds(n = as.numeric(table(wdbc.short$diagnosis)[<span class="string">"B"</span>]), K = <span class="number">10</span>, type = <span class="string">"random"</span>)</div><div class="line">set.seed(<span class="number">2014</span>)</div><div class="line">Malignant.folds &lt;- cvFolds(n = as.numeric(table(wdbc.short$diagnosis)[<span class="string">"M"</span>]), K = <span class="number">10</span>, type = <span class="string">"random"</span>)</div><div class="line">index.matrix &lt;- rbind(cbind(Benign.folds$which,as.vector(Benign.folds$subsets)),cbind(Malignant.folds$which,as.vector(Malignant.folds$subsets)+as.numeric(table(wdbc.short$diagnosis)[<span class="string">"B"</span>])))</div></pre></td></tr></table></figure>
+
+<hr>
+<p>由于一共有 569 个样本，无法均匀分成 10 组，所以我们需要用一个因子 <strong>index.folds</strong> 来存放各个组对应样本的下标。对于每个组，我们使用另外 9 组建模，并对该组进行验证，此即交叉验证。 <code>prediction.right</code> 向量用来存放每组验证的正确率.</p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">index.folds &lt;- list()</div><div class="line">prediction.right &lt;- vector()</div><div class="line"><span class="keyword">for</span>(i <span class="keyword">in</span> <span class="number">1</span>:<span class="number">10</span>){</div><div class="line">  index.folds[[i]] &lt;- index.matrix[index.matrix[,<span class="number">1</span>] == i,<span class="number">2</span>]</div><div class="line">}</div><div class="line"><span class="keyword">for</span>(i <span class="keyword">in</span> <span class="number">1</span>:<span class="number">10</span>){</div><div class="line">  current.model &lt;- knn3(diagnosis ~ ., data = wdbc.short, subset = -index.folds[[i]])</div><div class="line">  prediction &lt;- predict(current.model, newdata = wdbc.short[index.folds[[i]],<span class="number">2</span>:<span class="number">4</span>], type = <span class="string">"class"</span>)</div><div class="line">  prediction.right[i] &lt;- sum(prediction == wdbc.short[index.folds[[i]],<span class="string">"diagnosis"</span>])</div><div class="line">}</div><div class="line">sum(prediction.right)/nrow(wdbc.short)</div></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">## [1] 0.9507909</span></div></pre></td></tr></table></figure>
+
+<hr>
+<p>最后我们看到，使用 <strong>10-fold crossvalidations</strong> 的正确率为 0.9507909, 虽然优于没有使用交叉验证的情况，但是并没有达到预想中的 97.5%, 这可能和我们并没有使用 <strong>repeat</strong> 方法有关。</p>
+]]></content>
+         
+         
+           
+             
+              <breadCrumb title="Machine Learning" url="http://ripeconan.com/categories/Machine-Learning/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>http://ripeconan.com/2014/11/11/knn/</loc>
     <lastmod>2014-11-11T04:12:28.000Z</lastmod>
     <data>
